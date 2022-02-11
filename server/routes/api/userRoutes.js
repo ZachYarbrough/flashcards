@@ -77,7 +77,7 @@ router.post('/login', async ({ body }, res) => {
         .catch(err => res.json(err));
 
     if (!user) {
-        res.status(404).json({ message: 'Incorrect email.' });
+        res.status(404).json({ message: 'Incorrect email.', test: [body.email, body.password] });
         return;
     }
 
