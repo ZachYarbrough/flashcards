@@ -1,21 +1,26 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import React, { useState, useEffect, useCallback } from "react";
 import { Route, Routes } from 'react-router-dom';
 
-// import { Login, Register, Dashboard, NoMatch } from './pages';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import NoMatch from './pages/NoMatch'
 
-import Header from './components/Header';
+import Navbar from './components/Navbar';
 
 function App() {
+
   return (
     <div>
-      <Header />
       <Routes>
-        <Route path='/' element={<Dashboard />} />
+        <Route path='/' element={
+          <div>
+            <Navbar />
+            <Dashboard />
+          </div>
+        } />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='*' element={<NoMatch />} />
