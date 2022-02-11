@@ -8,7 +8,7 @@ function Navbar() {
     const token = Auth.getToken();
 
     // Decrypts token payload
-    let user = '';
+    let user = null;
     if (token) user  = Auth.getProfile().data;
 
     // Logs user out

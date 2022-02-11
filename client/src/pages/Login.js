@@ -1,5 +1,6 @@
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Container } from 'react-bootstrap';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Auth from '../utils/auth';
 
 function Login() {
@@ -20,7 +21,6 @@ function Login() {
         event.preventDefault();
 
         try {
-
             const data = await fetch(`http://localhost:3001/api/users/login`, {
                 method: 'POST',
                 header: {
@@ -29,7 +29,7 @@ function Login() {
                 body: new URLSearchParams(formState)
             })
                 .then((userData) => userData.json());
-
+            
             Auth.login(data.token);
         } catch (e) {
             console.error(e);
@@ -43,22 +43,22 @@ function Login() {
     };
 
     return (
-        <div>
-            <div className='color-overlay d-flex 
+        <div className='color-overlay d-flex 
             justify-content-center align-items-center'>
-                <Form className='rounded p-4 p-sm-3' onSubmit={handleFormSubmit}>
-                    <Form.Group className='mb-3' controlId='formBasicEmail'>
-                        <Form.Label>Email Address</Form.Label>
-                        <Form.Control type='email' placeholder='Enter Email' name='email' onChange={handleChange} />
-                        <Form.Text className='text-muted'>We'll never share your email with anyone else.</Form.Text>
-                    </Form.Group>
-                    <Form.Group className='mb-3' controlId='formBasicPassword'>
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type='password' placeholder='Enter Password' name='password' onChange={handleChange} />
-                    </Form.Group>
-                    <Button variant='primary' type='submit'>Login</Button>
-                </Form>
-            </div>
+            <Form className='rounded p-4 p-sm-3' onSubmit={handleFormSubmit}>
+                <Form.Group className='mb-3' controlId='formBasicEmail'>
+                    <Form.Label>Email Address</Form.Label>
+                    <Form.Control type='email' placeholder='Enter Email' name='email' onChange={handleChange} />
+                    <Form.Text className='text-muted'>We'll never share your email with anyone else.</Form.Text>
+                </Form.Group>
+                <Form.Group className='mb-3' controlId='formBasicPassword'>
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type='password' placeholder='Enter Password' name='password' onChange={handleChange} />
+                </Form.Group>
+
+                <Button variant='primary' type='submit'>Login</Button>
+                <Link to='/register' className='text-muted'>Create an Account</Link>
+            </Form>
         </div>
     );
 }
