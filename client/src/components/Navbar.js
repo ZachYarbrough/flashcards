@@ -19,7 +19,7 @@ function Navbar() {
     }
 
     return (
-        <Nav>
+        <Nav className='white-shadow'>
             <Container>
                 <Nav.Brand>Flashcards</Nav.Brand>
                 {user ?

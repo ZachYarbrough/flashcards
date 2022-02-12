@@ -5,7 +5,8 @@ const cardSchema = new Schema(
         initialText: { type: String, required: true, trim: true },
         revealText: { type: String, required: true, trim: true },
         resources: [{ type: String, trim: true, }],
-        topics: [{ type: String, trim: true }]
+        topics: [{ type: String, trim: true }],
+        known: { type: Boolean, default: false }
     },
     {
         versionKey: false

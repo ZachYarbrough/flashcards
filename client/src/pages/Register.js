@@ -49,7 +49,7 @@ function Login() {
         <div>
             <div className='color-overlay d-flex 
             justify-content-center align-items-center'>
-                <Form className='rounded p-4 p-sm-3' onSubmit={handleFormSubmit}>
+                <Form className='white-shadow rounded p-4 p-sm-3' onSubmit={handleFormSubmit}>
                     <Form.Group className='mb-3' controlId='formBasicFirstName'>
                         <Form.Label>First Name</Form.Label>
                         <Form.Control placeholder='Enter First Name' name='firstName' onChange={handleChange}/>
