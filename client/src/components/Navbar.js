@@ -21,7 +21,7 @@ function Navbar() {
     return (
         <Nav className='white-shadow'>
             <Container>
-                <Nav.Brand>Flashcards</Nav.Brand>
+                <Nav.Brand>Dashboard</Nav.Brand>
                 {user ?
                     <Nav.Text>
                         Signed in as: <Link to='/login' onClick={handleLogout}>{user.firstName} {user.lastName}</Link>
