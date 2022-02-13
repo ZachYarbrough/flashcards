@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Accordion, Button, Form } from 'react-bootstrap';
 import Auth from '../utils/auth';
+import CreateModal from '../components/CreateModal';
 
 function Dashboard() {
 
     const user = Auth.getProfile().data;
     const [cards, setCards] = useState([]);
     const [isEdit, setIsEdit] = useState('');
+    const [show, setShow] = useState(false);
     const [formState, setFormState] = useState({ initialText: '', revealText: '', topics: [], resources: [], known: false })
 
     const handleCardData = async () => {
@@ -18,6 +20,14 @@ function Dashboard() {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    const handleCardCreate = async () => {
+        setShow(true)
+    }
+
+    const handleModalClose = async () => {
+        setShow(false);
     }
 
     const handleCardDelete = async (e) => {
@@ -82,34 +92,15 @@ function Dashboard() {
         handleCardData();
     }, []);
 
-    // --- Add to Card Creation Component ---
-    // const [formState, setFormState] = useState({ initialText: '', revealText: '', resources: [], topics: [] });
-
-    // const handleCardCreation = async () => {
-    //     try {
-    //         const data = await fetch(`http://localhost:3001/api/cards`, {
-    //             method: 'POST',
-    //             header: {
-    //                 "Content-Type": "application/x-www-form-urlencoded"
-    //             },
-    //             body: new URLSearchParams(formState)
-    //         })
-    //             .then((cardData) => cardData.json());
-
-    //         return data;
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
-
     return (
         <div className='color-overlay d-flex 
             justify-content-center align-items-center'>
             <div className='container'>
                 <div className='row'>
-                    <div className ='d-flex align-items-center'>
+                    <div className='d-flex align-items-center'>
                         <h4 className='mt-2'>Cards</h4>
-                        <Button variant='secondary' className='m-2'>Create New</Button>
+                        <Button variant='secondary' className='m-2' onClick={handleCardCreate}>Create New</Button>
+                        <CreateModal show={show} handleModalClose={handleModalClose}></CreateModal>
                     </div>
                     <Accordion className='col-12'>
                         {cards.map((card, i) => {
