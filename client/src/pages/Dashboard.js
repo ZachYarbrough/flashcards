@@ -107,7 +107,10 @@ function Dashboard() {
             justify-content-center align-items-center'>
             <div className='container'>
                 <div className='row'>
-                    <h4>Cards</h4>
+                    <div className ='d-flex align-items-center'>
+                        <h4 className='mt-2'>Cards</h4>
+                        <Button variant='secondary' className='m-2'>Create New</Button>
+                    </div>
                     <Accordion className='col-12'>
                         {cards.map((card, i) => {
                             return (
