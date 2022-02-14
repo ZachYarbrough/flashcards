@@ -1,74 +1,185 @@
-import React, { useState } from 'react';
-import { Card, Accordion, Alert } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Alert, Accordion, Button, Form } from 'react-bootstrap';
 import Auth from '../utils/auth';
+import CreateModal from '../components/CreateModal';
 
 function Dashboard() {
-    // --- Add to Card Creation Component ---
-    // const [formState, setFormState] = useState({ initialText: '', revealText: '', resources: [], topics: [] });
 
     const user = Auth.getProfile().data;
-
+    const [cards, setCards] = useState([]);
+    const [isEdit, setIsEdit] = useState('');
+    const [show, setShow] = useState(false);
+    const [formState, setFormState] = useState({ initialText: '', revealText: '', topics: [], resources: [], known: false })
+    console.log(user);
     const handleCardData = async () => {
         try {
             const data = await fetch(`http://localhost:3001/api/users/${user._id}`)
                 .then((cardData) => cardData.json());
 
-            return data.cards;
+            setCards(data.cards);
         } catch (e) {
             console.error(e);
         }
     }
 
-    // --- Add to Card Creation Component ---
-    // const handleCardCreation = async () => {
-    //     try {
-    //         const data = await fetch(`http://localhost:3001/api/cards`, {
-    //             method: 'POST',
-    //             header: {
-    //                 "Content-Type": "application/x-www-form-urlencoded"
-    //             },
-    //             body: new URLSearchParams(formState)
-    //         })
-    //             .then((cardData) => cardData.json());
+    const handleCardCreate = async () => {
+        setShow(true)
+    }
 
-    //         return data;
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
+    const handleModalClose = async () => {
+        setShow(false);
+    }
+
+    const handleCardDelete = async (e) => {
+        e.stopPropagation();
+        const cardId = e.target.getAttribute("data-id");
+        try {
+            await fetch(`http://localhost:3001/api/cards/${cardId}`, {
+                method: 'DELETE'
+            });
+
+            handleCardData();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // update state based on form input changes
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+
+        setFormState({
+            ...formState,
+            [name]: value,
+        });
+    };
+
+    const handleCardForm = async (e) => {
+        e.stopPropagation();
+        const cardId = e.target.getAttribute('data-id');
+        const Accordion = document.getElementById(cardId);
+        setIsEdit(cardId);
+
+    }
+
+    const handleCardEdit = async (e) => {
+        e.stopPropagation();
+        const cardId = e.target.getAttribute("data-id");
+        // try {
+        //     await fetch(`http://localhost:3001/api/cards/${cardId}`, {
+        //         method: 'PUT',
+        //         header: {
+        //             "Content-Type": "application/x-www-form-urlencoded"
+        //         },
+        //         body: new URLSearchParams(formState)
+        //     });
+
+        //     handleCardData();
+        // } catch (e) {
+        //     console.error(e);
+        // }
+
+        // clear form values
+        setFormState({
+            initialText: '',
+            revealText: '',
+            topics: [],
+            resources: [],
+            known: false
+        });
+
+        setIsEdit(null);
+    }
+
+    useEffect(() => {
+        handleCardData();
+    }, []);
 
     return (
         <div className='color-overlay d-flex 
             justify-content-center align-items-center'>
-            <Card className='rounded'>
-                <Card.Header className='d-flex'>
-                    <Alert variant='dark'>
-                        String
-                    </Alert>
-                    <Alert variant='dark'>
-                        Array
-                    </Alert>
-                </Card.Header>
-                <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
-                    <Card.Text>
-                        Some quick example text to build on the card title and make up the bulk of
-                        the card's content.
-                    </Card.Text>
-                </Card.Body>
-                <Card.Body>
-                    <Accordion>
-                        <Accordion.Item eventKey="0">
-                            <Accordion.Header>Resources</Accordion.Header>
-                            <Accordion.Body>
-                                <Card.Link href="#">Card Link</Card.Link>
-                                <Card.Link href="#">Another Link</Card.Link>
-                            </Accordion.Body>
-                        </Accordion.Item>
+            <div className='container'>
+                <div className='row'>
+                    <div className='d-flex align-items-center'>
+                        <h4 className='mt-2'>Cards</h4>
+                        <Button variant='secondary' className='m-2' onClick={handleCardCreate}>Create New</Button>
+                        <CreateModal show={show} handleModalClose={handleModalClose} userTopics={user.topics}></CreateModal>
+                    </div>
+                    <Accordion className='col-12'>
+                        {cards.map((card, i) => {
+                            return (
+                                <div>
+                                    {isEdit === card._id ?
+                                        <Form>
+                                            <Accordion.Item key={i} id={card._id} eventKey={i} >
+                                                <Accordion.Header className='d-flex align-items-center'>
+                                                    <Button onClick={handleCardEdit} variant='success' className='mx-1' data-id={card._id}>Save</Button>
+                                                    <Form.Group>
+                                                        <Form.Control type='text' placeholder='Front Text' defaultValue={card.initialText} name='initialText' onChange={handleChange}></Form.Control>
+                                                    </Form.Group>
+                                                    {card.topics.map(topic => {
+                                                        return (
+                                                            <Alert variant='secondary' className='p-1 m-1' key={topic}>
+                                                                {topic}
+                                                            </Alert>
+                                                        )
+                                                    })}
+                                                    {card.known && <Alert variant='success' className='p-1 m-1'>Known</Alert>}
+                                                </Accordion.Header>
+                                                <Accordion.Body>
+                                                    <Form.Group>
+                                                        <Form.Control type='text' placeholder='Back Text' defaultValue={card.revealText} name='revealText' onChange={handleChange}></Form.Control>
+                                                    </Form.Group>
+                                                    {card.resources.length >= 1 &&
+                                                        <div>
+                                                            <br />
+                                                            <div>Resources:</div>
+                                                            {card.resources.map((resource, i) => {
+                                                                const resourceId = `resource${i}`;
+                                                                return (
+                                                                    <Form.Group>
+                                                                        <Form.Control type='text' placeholder='Resource' defaultValue={resource} name={resourceId} onChange={handleChange}></Form.Control>
+                                                                    </Form.Group>
+                                                                );
+                                                            })}
+                                                        </div>}
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        </Form>
+                                        :
+                                        <Accordion.Item key={i} id={card._id} eventKey={i}>
+                                            <Accordion.Header className='d-flex align-items-center'>
+                                                <Button onClick={handleCardForm} data-id={card._id} className='ms-1'>Edit</Button>
+                                                <Button onClick={handleCardDelete} data-id={card._id} variant='danger' className='mx-1'>Delete</Button>
+                                                {card.initialText}
+                                                {card.topics.map(topic => {
+                                                    return (
+                                                        <Alert variant='secondary' className='p-1 m-1' key={topic}>
+                                                            {topic}
+                                                        </Alert>
+                                                    )
+                                                })}
+                                                {card.known && <Alert variant='success' className='p-1 m-1'>Known</Alert>}
+                                            </Accordion.Header>
+                                            <Accordion.Body>
+                                                <div>{card.revealText}</div>
+                                                {card.resources.length >= 1 &&
+                                                    <div>
+                                                        <br />
+                                                        <div>Resources:</div>
+                                                        {card.resources.map(resource => { return (<a target='_' href={resource} key={resource}>{resource}</a>); })}
+                                                    </div>}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    }
+                                </div>
+                            )
+                        })
+                        }
                     </Accordion>
-                </Card.Body>
-            </Card>
-        </div>
+                </div>
+            </div>
+        </div >
     );
 }
 
