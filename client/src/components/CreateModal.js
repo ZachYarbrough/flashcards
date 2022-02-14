@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Form, Alert } from 'react-bootstrap';
 
-function CreateModal({ show, handleModalClose }) {
+function CreateModal({ show, handleModalClose, userTopics }) {
 
     const [formState, setFormState] = useState({ initialText: '', revealText: '', resources: [], topics: [], known: false });
+    const [resourceArray, setResourceArray] = useState([]);
+    const [resourceState, setResourceState] = useState('');
+    const [topicArray, setTopicArray] = useState([]);
+
+    const handleResourceChange = (event) => {
+        const { value } = event.target;
+
+        setResourceState(value);
+    }
+
+    const handleResources = () => {
+        setResourceArray([...resourceArray, resourceState]);
+        console.log(resourceArray);
+        setResourceState('');
+    }
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -43,8 +58,15 @@ function CreateModal({ show, handleModalClose }) {
         });
     };
 
+    useEffect(() => {
+        if (!show) {
+            setResourceArray([]);
+            setTopicArray([]);
+        }
+    }, [show]);
+
     return (
-        <Modal show={show} onHide={handleModalClose} className='color-overlay d-flex 
+        <Modal show={show} onHide={handleModalClose} className='d-flex 
             justify-content-center align-items-center'>
             <Modal.Header>
                 <Modal.Title>Create New Card</Modal.Title>
@@ -63,11 +85,35 @@ function CreateModal({ show, handleModalClose }) {
                     </div>
                     <Form.Group className='mb-3 mx-1' controlId='formBasicTopics'>
                         <Form.Label>Topics</Form.Label>
-                        <Form.Control name='topics' onChange={handleChange} />
+                        <div className='d-flex align-items-center mb-2'>
+                            {topicArray.map(topic => {
+                                return (
+                                    <Alert variant='secondary' onClose={() => console.log('test')} dismissible className='m-1' key={topic}>
+                                        {topic}
+                                    </Alert>
+                                )
+                            })}
+                        </div>
+                        <Form.Select name='topics' placeholder='Enter Topic' onChange={handleChange}>
+                            <option selected>Select Topic</option>
+                            {userTopics.map((topic) => {
+                                return (
+                                    <option key={topic} value={topic}>{topic}</option>
+                                )
+                            })}
+                        </Form.Select>
                     </Form.Group>
                     <Form.Group className='mb-3 mx-1' controlId='formBasicResources'>
                         <Form.Label>Resources</Form.Label>
-                        <Form.Control name='resources' onChange={handleChange} />
+                        {resourceArray.map(resource => {
+                            return (
+                                <div className='text-muted mb-1' key={resource}>{resource}</div>
+                            )
+                        })}
+                        <div className='d-flex align-items-center'>
+                            <Form.Control name='resources' placeholder='Enter Resource' onChange={handleResourceChange} />
+                            <Button variant='primary' onClick={handleResources} className='ms-2'>Add</Button>
+                        </div>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>

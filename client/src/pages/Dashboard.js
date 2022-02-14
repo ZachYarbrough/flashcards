@@ -10,7 +10,7 @@ function Dashboard() {
     const [isEdit, setIsEdit] = useState('');
     const [show, setShow] = useState(false);
     const [formState, setFormState] = useState({ initialText: '', revealText: '', topics: [], resources: [], known: false })
-
+    console.log(user);
     const handleCardData = async () => {
         try {
             const data = await fetch(`http://localhost:3001/api/users/${user._id}`)
@@ -63,20 +63,21 @@ function Dashboard() {
     }
 
     const handleCardEdit = async (e) => {
+        e.stopPropagation();
         const cardId = e.target.getAttribute("data-id");
-        try {
-            await fetch(`http://localhost:3001/api/cards/${cardId}`, {
-                method: 'PUT',
-                header: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams(formState)
-            });
+        // try {
+        //     await fetch(`http://localhost:3001/api/cards/${cardId}`, {
+        //         method: 'PUT',
+        //         header: {
+        //             "Content-Type": "application/x-www-form-urlencoded"
+        //         },
+        //         body: new URLSearchParams(formState)
+        //     });
 
-            handleCardData();
-        } catch (e) {
-            console.error(e);
-        }
+        //     handleCardData();
+        // } catch (e) {
+        //     console.error(e);
+        // }
 
         // clear form values
         setFormState({
@@ -86,6 +87,8 @@ function Dashboard() {
             resources: [],
             known: false
         });
+
+        setIsEdit(null);
     }
 
     useEffect(() => {
@@ -100,7 +103,7 @@ function Dashboard() {
                     <div className='d-flex align-items-center'>
                         <h4 className='mt-2'>Cards</h4>
                         <Button variant='secondary' className='m-2' onClick={handleCardCreate}>Create New</Button>
-                        <CreateModal show={show} handleModalClose={handleModalClose}></CreateModal>
+                        <CreateModal show={show} handleModalClose={handleModalClose} userTopics={user.topics}></CreateModal>
                     </div>
                     <Accordion className='col-12'>
                         {cards.map((card, i) => {
@@ -110,6 +113,7 @@ function Dashboard() {
                                         <Form>
                                             <Accordion.Item key={i} id={card._id} eventKey={i} >
                                                 <Accordion.Header className='d-flex align-items-center'>
+                                                    <Button onClick={handleCardEdit} variant='success' className='mx-1' data-id={card._id}>Save</Button>
                                                     <Form.Group>
                                                         <Form.Control type='text' placeholder='Front Text' defaultValue={card.initialText} name='initialText' onChange={handleChange}></Form.Control>
                                                     </Form.Group>
@@ -145,7 +149,7 @@ function Dashboard() {
                                         :
                                         <Accordion.Item key={i} id={card._id} eventKey={i}>
                                             <Accordion.Header className='d-flex align-items-center'>
-                                                <Button onClick={handleCardForm} data-id={card._id}>Edit</Button>
+                                                <Button onClick={handleCardForm} data-id={card._id} className='ms-1'>Edit</Button>
                                                 <Button onClick={handleCardDelete} data-id={card._id} variant='danger' className='mx-1'>Delete</Button>
                                                 {card.initialText}
                                                 {card.topics.map(topic => {
